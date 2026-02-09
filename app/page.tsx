@@ -1,17 +1,26 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { api } from '../src/lib/api';
 import { useRouter } from 'next/navigation';
-import { UserPlus, Mail, Lock, User, Key, LogIn, ArrowRight } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Key, LogIn, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showGroupKey, setShowGroupKey] = useState(false); // Olhinho para a chave de grupo
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ nome: '', email: '', senha: '', cargoDesejado: 'USER', chaveAcesso: '' });
+  const [formData, setFormData] = useState({ 
+    nome: '', 
+    email: '', 
+    senha: '', 
+    cargoDesejado: 'USER', 
+    chaveAcesso: '' 
+  });
 
-  // Limpa vestígios antigos para evitar conflitos de sessão
-  useEffect(() => { localStorage.clear(); }, []);
+  useEffect(() => { 
+    localStorage.clear(); 
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,14 +31,14 @@ export default function AuthPage() {
         localStorage.setItem('userToken', response.data.token);
         localStorage.setItem('userRole', response.data.role);
         localStorage.setItem('userName', response.data.nome);
-
-        // INJEÇÃO IMEDIATA: Resolve o erro 401 na hora
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-
         window.location.href = '/dashboard';
       }
-    } catch (err: any) { alert(err.response?.data?.erro || "Credenciais inválidas."); }
-    finally { setLoading(false); }
+    } catch (err: any) { 
+      alert(err.response?.data?.erro || "Credenciais inválidas."); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -39,60 +48,119 @@ export default function AuthPage() {
       await api.post('/auth/registrar', formData);
       alert("Sucesso! Agora faça seu login.");
       setIsLogin(true);
-    } catch (err: any) { alert(err.response?.data?.erro || "Erro no cadastro."); }
-    finally { setLoading(false); }
+    } catch (err: any) { 
+      alert(err.response?.data?.erro || "Erro ao criar conta."); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6 font-sans">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-900/40">
+        <div className="text-center mb-4">
+          <div className="bg-blue-600 w-13 h-13 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-lg shadow-blue-900/40">
             {isLogin ? <LogIn className="text-white" size={32} /> : <UserPlus className="text-white" size={32} />}
           </div>
-          <h1 className="text-3xl font-black text-white tracking-tighter">{isLogin ? 'Entrar' : 'Criar Conta'}</h1>
+          <h1 className="text-2xl font-black text-white tracking-tighter">
+            {isLogin ? 'Gestão de Louvores' : 'Criar Conta'}
+          </h1>
         </div>
+
         <div className="bg-zinc-900/50 p-8 rounded-[2.5rem] border border-zinc-800 shadow-2xl">
           <form onSubmit={isLogin ? handleLogin : handleRegister} className="space-y-4">
+            
             {!isLogin && (
-              <input required placeholder="Nome Completo" className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-2xl text-white outline-none focus:border-blue-500"
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
+              <div className="relative flex items-center">
+                <User className="absolute left-4 text-zinc-500" size={18} />
+                <input 
+                  required 
+                  placeholder="Nome Completo" 
+                  className="w-full bg-zinc-950 border border-zinc-800 p-4 pl-12 rounded-2xl text-white outline-none focus:border-blue-500"
+                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })} 
+                />
+              </div>
             )}
-            <input required type="email" placeholder="E-mail" className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-2xl text-white outline-none focus:border-blue-500"
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-            <input required type="password" placeholder="Senha" className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-2xl text-white outline-none focus:border-blue-500"
-              onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
+
+            <div className="relative flex items-center">
+              <Mail className="absolute left-4 text-zinc-500" size={18} />
+              <input 
+                required 
+                type="email" 
+                placeholder="E-mail" 
+                className="w-full bg-zinc-950 border border-zinc-800 p-4 pl-12 rounded-2xl text-white outline-none focus:border-blue-500"
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+              />
+            </div>
+
+            {/* CAMPO DE SENHA COM OLHINHO */}
+            <div className="relative flex items-center">
+              <Lock className="absolute left-4 text-zinc-500" size={18} />
+              <input 
+                required 
+                type={showPassword ? "text" : "password"} 
+                placeholder="Senha" 
+                className="w-full bg-zinc-950 border border-zinc-800 p-4 pl-12 pr-12 rounded-2xl text-white outline-none focus:border-blue-500"
+                onChange={(e) => setFormData({ ...formData, senha: e.target.value })} 
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+
             {!isLogin && (
               <>
-                <select className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-2xl text-white outline-none"
-                  value={formData.cargoDesejado} onChange={(e) => setFormData({ ...formData, cargoDesejado: e.target.value })}>
+                <select 
+                  className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-2xl text-white outline-none focus:border-blue-500 appearance-none"
+                  value={formData.cargoDesejado} 
+                  onChange={(e) => setFormData({ ...formData, cargoDesejado: e.target.value })}
+                >
                   <option value="USER">Integrante</option>
                   <option value="MUSICIAN">Músico</option>
                   <option value="ADMIN">Administrador</option>
                 </select>
-                {/* No seu arquivo de Registro (Frontend) */}
+
                 {formData.cargoDesejado !== 'USER' && (
-                  <div className="relative">
-                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                  <div className="relative flex items-center">
+                    <Key className="absolute left-4 text-zinc-500" size={18} />
                     <input
                       required
-                      type='password'
-                      autoComplete="new-password"
-                      placeholder={formData.cargoDesejado === 'ADMIN' ? "Chave Mestra Admin" : "Chave de Músico"}
-                      className="w-full bg-zinc-950 border border-blue-900/50 p-4 pl-12 rounded-2xl text-white outline-none focus:border-blue-500"
-                      onChange={(e) => setFormData({ ...formData, chaveAcesso: e.target.value })} // Verifique se é chaveAcesso aqui
+                      type={showGroupKey ? "text" : "password"}
+                      placeholder="Chave de músico para cadastro"
+                      className="w-full bg-zinc-950 border border-zinc-800 p-4 pl-12 pr-12 rounded-2xl text-white outline-none focus:border-blue-500"
+                      value={formData.chaveAcesso}
+                      onChange={(e) => setFormData({ ...formData, chaveAcesso: e.target.value })}
                     />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowGroupKey(!showGroupKey)}
+                      className="absolute right-4 text-zinc-500 hover:text-zinc-300 transition-colors"
+                    >
+                      {showGroupKey ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
                 )}
               </>
             )}
-            <button disabled={loading} className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold text-white transition mt-4">
-              {loading ? 'Processando...' : (isLogin ? 'Entrar' : 'Cadastrar')}
+
+            <button 
+              disabled={loading} 
+              className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold text-white transition-all mt-4 active:scale-[0.98]"
+            >
+              {loading ? 'Processando...' : (isLogin ? 'Entrar no Sistema' : 'Criar minha conta')}
             </button>
           </form>
         </div>
-        <button onClick={() => setIsLogin(!isLogin)} className="w-full text-zinc-500 hover:text-white text-sm mt-8 transition">
-          {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Login"}
+
+        <button 
+          onClick={() => setIsLogin(!isLogin)}
+          className="w-full text-center mt-4 text-zinc-400 hover:text-zinc-300 transition-colors"
+        >
+          {isLogin ? 'Não tem conta? Crie uma aqui' : 'Já tem conta? Faça login'}
         </button>
       </div>
     </div>
