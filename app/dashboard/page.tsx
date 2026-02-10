@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../src/lib/api';
 import { useRouter } from 'next/navigation';
+import { Link } from 'lucide-react';
 import { Music, Plus, LogOut, Users, Search } from 'lucide-react';
 
 export default function Dashboard() {
@@ -78,6 +79,21 @@ export default function Dashboard() {
                         <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-1 opacity-70">
                             Logado como: {formatarCargo(userRole)}
                         </p>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {/* Novo botão para acesso à lista de hinos */}
+                        <Link
+                            href="/hinos"
+                            className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl transition"
+                        >
+                            <Music size={20} />
+                            <span>Ver Hinos</span>
+                        </Link>
+
+                        <button onClick={() => router.push('/dashboard/hino')} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                            <span>Painel integrantes</span>
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-3">

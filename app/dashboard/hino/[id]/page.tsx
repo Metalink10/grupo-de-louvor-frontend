@@ -169,7 +169,7 @@ export default function ExibirHino() {
                   placeholder="Edite a letra aqui..."
                 />
               ) : (
-                <p className="text-3xl leading-relaxed whitespace-pre-line font-medium text-zinc-300">
+                <p className="text-3xl leading-relaxed whitespace-pre-line font-medium text-white-300">
                   {hino.letra}
                 </p>
               )}
@@ -184,20 +184,20 @@ export default function ExibirHino() {
                 /* Músicos também podem editar a letra abaixo da cifra se desejar */
                 <div className="flex flex-col gap-6">
                   <textarea
-                    className="w-full bg-zinc-950 border border-blue-500/30 p-8 rounded-3xl font-mono text-xl leading-relaxed text-blue-400 outline-none min-h-[400px] focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-zinc-950 border border-blue-500/30 p-8 rounded-3xl font-mono text-xl leading-relaxed text-white-400 outline-none min-h-[400px] focus:ring-1 focus:ring-blue-500"
                     value={novaCifra}
                     onChange={(e) => setNovaCifra(e.target.value)}
                     placeholder="Cole a cifra aqui..."
                   />
-                  <p className="text-xs font-bold text-zinc-500 uppercase px-2">Editar Letra (Base)</p>
+                  <p className="text-xs font-bold text-red-500 uppercase px-2">Editar Letra (Base)</p>
                   <textarea
-                    className="w-full bg-zinc-950 border border-zinc-800 p-6 rounded-2xl text-lg text-zinc-400 outline-none min-h-[200px]"
+                    className="w-full bg-zinc-950 border border-zinc-600 p-6 rounded-2xl text-lg text-white-400 outline-none min-h-[200px]"
                     value={novaLetra}
                     onChange={(e) => setNovaLetra(e.target.value)}
                   />
                 </div>
               ) : (
-                <pre className="font-mono text-base md:text-lg leading-relaxed text-blue-400 ... whitespace-pre overflow-x-auto scrollbar-hide">
+                <pre className="font-mono text-base md:text-lg leading-relaxed text-white-400 ... whitespace-pre overflow-x-auto scrollbar-hide">
                   {hino.cifraTexto || "Nenhuma cifra disponível."}
                 </pre>
               )}

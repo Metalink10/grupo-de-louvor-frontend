@@ -85,7 +85,7 @@ export default function Register() {
                         </select>
                     </div>
 
-                    {/* Campo de Chave de Acesso (Exigido pelo seu Backend) */}
+                    
                     {/* Campo de Chave de Acesso (Exigido pelo seu Backend) */}
                     <form onSubmit={handleRegister} className="space-y-4">
                         <input required placeholder="Nome Completo"
