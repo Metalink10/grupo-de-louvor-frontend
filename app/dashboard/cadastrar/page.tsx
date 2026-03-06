@@ -18,6 +18,7 @@ export default function CadastrarHino() {
     });
 
     const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    
 
     useEffect(() => {
         const role = localStorage.getItem('userRole');
@@ -40,8 +41,8 @@ export default function CadastrarHino() {
         try {
             // Define a rota baseada no cargo para respeitar seu backend
             const rota = (userRole === 'MUSICIAN' || userRole === 'ADMIN')
-                ? '/hinos/musico/admin'
-                : '/hinos/integrante/criar';
+                ? '/api/hinos/musico/admin'
+                : '/api/hinos/integrante/criar';
 
             await api.post(rota, formData);
             alert("Louvor cadastrado com sucesso!");

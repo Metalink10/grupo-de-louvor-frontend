@@ -23,7 +23,7 @@ export default function ExibirHino() {
 
   async function buscarHino() {
     try {
-      const response = await api.get(`/hinos/buscar/${id}`);
+      const response = await api.get(`/api/hinos/buscar/${id}`);
       const hinoData = Array.isArray(response.data) ? response.data[0] : response.data;
       setHino(hinoData);
       setNovoTom(hinoData.tom || '');
@@ -33,33 +33,76 @@ export default function ExibirHino() {
       console.error("Erro ao buscar hino", err);
     }
   }
-
-  const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
   const transporAcorde = (acorde: string, semitons: number) => {
-    const match = acorde.match(/^([A-G][#b]?)(.*)/);
+    // 1. Captura nota base (A-G) e separadamente o sustenido/bemol e o resto
+    const match = acorde.match(/^([A-G][#b]*)(.*)/);
     if (!match) return acorde;
-    let notaBase = match[1];
+
+    let notaBaseOriginal = match[1];
     const resto = match[2];
+
+    // Limpeza: Pega apenas a letra e UM sustenido/bemol se existir (evita G###)
+    let notaLimpa = notaBaseOriginal[0].toUpperCase();
+    if (notaBaseOriginal.includes('#')) notaLimpa += '#';
+    else if (notaBaseOriginal.includes('b')) notaLimpa += 'b';
+
     const mapaBemois: { [key: string]: string } = { "Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#" };
-    if (mapaBemois[notaBase]) notaBase = mapaBemois[notaBase];
-    const indexAtual = notas.indexOf(notaBase);
+    if (mapaBemois[notaLimpa]) notaLimpa = mapaBemois[notaLimpa];
+
+    const indexAtual = notas.indexOf(notaLimpa);
     if (indexAtual === -1) return acorde;
+
     let novoIndex = (indexAtual + semitons) % 12;
     if (novoIndex < 0) novoIndex += 12;
+
     return notas[novoIndex] + resto;
   };
 
   const aplicarTransposicao = (semitons: number) => {
-    const regexAcordes = /\b([A-G][#b]?[mMaj\d\+\-\/]*)\b/g;
-    const cifraTransposta = novaCifra.replace(regexAcordes, (match) => transporAcorde(match, semitons));
-    setNovaCifra(cifraTransposta);
-    setNovoTom((prev) => transporAcorde(prev, semitons));
-  };
+  // Regex para identificar acordes (Notas A-G com seus complementos)
+  const regexAcordes = /([A-G][#b]*[mMaj\d\+\-\/]*(?:\/[A-G][#b]*)?)/g;
+
+  // 1. Dividimos a cifra em linhas para analisar uma por uma
+  const linhas = novaCifra.split('\n');
+
+  const novasLinhas = linhas.map(linha => {
+    // 2. REGRA DE PROTEÇÃO:
+    // Se a linha contiver palavras com 3 ou mais letras minúsculas seguidas, 
+    // é quase certo que é uma linha de LETRA (ex: "está", "louvor", "amor").
+    // O acorde menor usa apenas um 'm' (ex: Am7), então ele passa no teste.
+    if (/[a-z]{3,}/.test(linha)) {
+      return linha; // Retorna a linha da letra sem mexer em nada
+    }
+
+    // 3. Se a linha for de cifras (não tem palavras longas), fazemos a troca
+    return linha.replace(regexAcordes, (match) => {
+      // Pequena trava extra: se a "nota" capturada for muito longa e tiver
+      // letras minúsculas estranhas, provavelmente não é um acorde.
+      if (match.length > 1 && /^[A-G][a-z]{2,}/.test(match)) {
+        return match;
+      }
+
+      // Se for acorde com barra (ex: C/E)
+      if (match.includes('/')) {
+        return match.split('/').map(p => transporAcorde(p.trim(), semitons)).join('/');
+      }
+      
+      return transporAcorde(match, semitons);
+    });
+  });
+
+  // 4. Junta as linhas de volta e atualiza o estado
+  setNovaCifra(novasLinhas.join('\n'));
+  
+  // Atualiza o Tom Principal do cabeçalho
+  setNovoTom((prev) => transporAcorde(prev, semitons));
+};
 
   const salvarAlteracoes = async () => {
     try {
-      await api.put(`/hinos/editar/${id}`, {
+      await api.put(`/api/hinos/editar/${id}`, {
         ...hino,
         tom: novoTom,
         cifraTexto: novaCifra,
@@ -76,10 +119,22 @@ export default function ExibirHino() {
   const deletarLouvor = async () => {
     if (confirm("Deseja realmente excluir este louvor definitivamente?")) {
       try {
-        await api.delete(`/hinos/excluir/${id}`);
+        // Chamamos o caminho completo começando com /api
+        // O interceptor já injeta o Bearer Token automaticamente aqui
+        await api.delete(`/api/hinos/deletar/${id}`);
+
+        alert("Louvor excluído com sucesso!");
         router.push('/dashboard');
-      } catch (err) {
-        alert("Erro ao excluir.");
+      } catch (err: any) {
+        console.error("Erro detalhado:", err.response);
+
+        if (err.response?.status === 404) {
+          alert("Erro 404: Rota não encontrada no servidor. Verifique o backend.");
+        } else if (err.response?.status === 403) {
+          alert("Erro 403: Você não tem permissão de ADMIN para excluir.");
+        } else {
+          alert("Erro ao excluir louvor.");
+        }
       }
     }
   };
@@ -198,7 +253,7 @@ export default function ExibirHino() {
                 </div>
               ) : (
                 <pre className="font-mono text-base md:text-lg leading-relaxed text-white-400 ... whitespace-pre overflow-x-auto scrollbar-hide">
-                  {hino.cifraTexto || "Nenhuma cifra disponível."}
+                  {novaCifra || "Nenhuma cifra disponível."}
                 </pre>
               )}
             </div>

@@ -21,7 +21,7 @@ export default function Register() {
         setLoading(true);
         try {
             // Chamando a rota correta: /auth/registrar
-            await api.post('/auth/registrar', formData);
+            await api.post('/api/auth/registrar', formData);
             alert("Cadastro realizado com sucesso!");
             router.push('/');
         } catch (err: any) {

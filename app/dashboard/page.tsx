@@ -15,6 +15,8 @@ export default function Dashboard() {
     const [userRole, setUserRole] = useState('');
     const [termoBusca, setTermoBusca] = useState('');
 
+
+
     useEffect(() => {
         const token = localStorage.getItem('userToken');
         const role = localStorage.getItem('userRole');
@@ -38,7 +40,6 @@ export default function Dashboard() {
                 hino.titulo?.includes(termo) ||
                 hino.autor?.includes(termo) ||
                 hino.letra?.includes(termo) ||
-                hino.cifraTexto?.includes(termo) ||
                 numeroVisual.includes(termo)
             );
         });
@@ -47,7 +48,7 @@ export default function Dashboard() {
 
     async function carregarHinos() {
         try {
-            const response = await api.get('/hinos/todos');
+            const response = await api.get('/api/hinos/todos');
             setHinos(response.data);
             setHinosFiltrados(response.data);
         } catch (err: any) {
@@ -79,21 +80,6 @@ export default function Dashboard() {
                         <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-1 opacity-70">
                             Logado como: {formatarCargo(userRole)}
                         </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        {/* Novo botão para acesso à lista de hinos */}
-                        <Link
-                            href="/hinos"
-                            className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl transition"
-                        >
-                            <Music size={20} />
-                            <span>Ver Hinos</span>
-                        </Link>
-
-                        <button onClick={() => router.push('/dashboard/hino')} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition">
-                            <span>Painel integrantes</span>
-                        </button>
                     </div>
 
                     <div className="flex items-center gap-3">

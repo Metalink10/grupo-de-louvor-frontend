@@ -26,7 +26,7 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await api.post('/auth/login', { email: formData.email, senha: formData.senha });
+      const response = await api.post('/api/auth/login', { email: formData.email, senha: formData.senha });
       if (response.data && response.data.token) {
         localStorage.setItem('userToken', response.data.token);
         localStorage.setItem('userRole', response.data.role);
@@ -45,7 +45,7 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/auth/registrar', formData);
+      await api.post('api/auth/registrar', formData);
       alert("Sucesso! Agora faça seu login.");
       setIsLogin(true);
     } catch (err: any) { 

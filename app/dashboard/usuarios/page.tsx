@@ -18,7 +18,7 @@ export default function CadastrarUsuario() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post('/auth/register', formData);
+            await api.post('/api/auth/register', formData);
             alert("Novo membro cadastrado com sucesso!");
             router.push('/dashboard');
         } catch (err) {
