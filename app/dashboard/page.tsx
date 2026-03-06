@@ -71,8 +71,12 @@ export default function Dashboard() {
         </div>
     );
 
+
+
     return (
+
         <div className="min-h-screen bg-zinc-950 p-6 text-white font-sans">
+
             <div className="max-w-6xl mx-auto">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
@@ -80,6 +84,17 @@ export default function Dashboard() {
                         <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-1 opacity-70">
                             Logado como: {formatarCargo(userRole)}
                         </p>
+                    </div>
+
+                    <div className="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 flex items-center gap-4 mb-4 shadow-xl max-w-xs">
+                        
+                        <div className=' flex items-center gap-4'>
+                            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Repertório Total</p>
+                            {/* O segredo está aqui: hinos.length */}
+                            <h2 className="text-1xl font-black text-white">
+                                {hinos.length > 0 ? hinos.length : "0"}
+                            </h2>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -124,7 +139,7 @@ export default function Dashboard() {
                                     className="bg-zinc-900/50 p-6 rounded-[1.8rem] border border-zinc-800 hover:border-blue-500/40 transition cursor-pointer group flex flex-col gap-4"
                                 >
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-zinc-600 tracking-widest opacity-50">
+                                        <span className="text-[15px] font-black text-zinc-400 tracking-widest opacity-50">
                                             {String(numeroReal).padStart(2, '0')}
                                         </span>
                                         <Music className="text-blue-500/60 group-hover:text-blue-400 transition" size={16} />

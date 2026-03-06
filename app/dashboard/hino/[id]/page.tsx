@@ -247,25 +247,45 @@ export default function ExibirHino() {
                 </div>
               ) : (
                 <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
-                  {novaCifra ? (
-                    novaCifra.split('\n').map((linha, index) => {
-                      // Lógica: Se NÃO tem 3 letras minúsculas seguidas, é CIFRA (Laranja)
-                      // Se tem palavras, é LETRA (Branco)
-                      const ehLinhaDeCifra = !/[a-z]{3,}/.test(linha) && linha.trim().length > 0;
+  {novaCifra ? (
+    novaCifra.split('\n').map((linha, index) => {
+      // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
+      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
 
-                      return (
-                        <div
-                          key={index}
-                          className={`${ehLinhaDeCifra ? 'text-orange-400 font-bold' : 'text-white'}`}
-                        >
-                          {linha || ' '}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
-                  )}
-                </pre>
+      // 2. Quebramos a linha preservando os espaços para não desalinhcar a cifra
+      // Usamos uma técnica de 'split' que mantém os espaços vazios
+      const partes = linha.split(/(\s+)/); 
+
+      return (
+        <div key={index} className="min-h-[1.2em]">
+          {partes.map((parte, pIndex) => {
+            const parteLimpa = parte.trim().toUpperCase().replace(/[\[\]()]/g, '');
+            
+            // Lógica para decidir se a palavra é um ACORDE ou uma ETIQUETA/LETRA
+            // - Se estiver na lista de etiquetas: BRANCO
+            // - Se for uma letra de música (3+ minúsculas): BRANCO
+            // - Se for curto e parecer nota (A, B, C, G#, Dm7): LARANJA
+            
+            const ehEtiqueta = etiquetas.includes(parteLimpa);
+            const ehPalavraDeLetra = /[a-z]{3,}/.test(parte);
+            const ehAcorde = !ehEtiqueta && !ehPalavraDeLetra && /[A-G]/.test(parte);
+
+            return (
+              <span
+                key={pIndex}
+                className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
+              >
+                {parte}
+              </span>
+            );
+          })}
+        </div>
+      );
+    })
+  ) : (
+    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
+  )}
+</pre>
               )}
             </div>
           )}
