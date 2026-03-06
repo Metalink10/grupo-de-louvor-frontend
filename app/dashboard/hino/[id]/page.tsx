@@ -33,7 +33,7 @@ export default function ExibirHino() {
       console.error("Erro ao buscar hino", err);
     }
   }
-const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
   const transporAcorde = (acorde: string, semitons: number) => {
     // 1. Captura nota base (A-G) e separadamente o sustenido/bemol e o resto
@@ -61,44 +61,39 @@ const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   };
 
   const aplicarTransposicao = (semitons: number) => {
-  // Regex para identificar acordes (Notas A-G com seus complementos)
-  const regexAcordes = /([A-G][#b]*[mMaj\d\+\-\/]*(?:\/[A-G][#b]*)?)/g;
+    // Regex para identificar acordes (Notas A-G com seus complementos)
+    const regexAcordes = /([A-G][#b]*[mMaj\d\+\-\/]*(?:\/[A-G][#b]*)?)/g;
 
-  // 1. Dividimos a cifra em linhas para analisar uma por uma
-  const linhas = novaCifra.split('\n');
+    // 1. Dividimos a cifra em linhas para analisar uma por uma
+    const linhas = novaCifra.split('\n');
 
-  const novasLinhas = linhas.map(linha => {
-    // 2. REGRA DE PROTEÇÃO:
-    // Se a linha contiver palavras com 3 ou mais letras minúsculas seguidas, 
-    // é quase certo que é uma linha de LETRA (ex: "está", "louvor", "amor").
-    // O acorde menor usa apenas um 'm' (ex: Am7), então ele passa no teste.
-    if (/[a-z]{3,}/.test(linha)) {
-      return linha; // Retorna a linha da letra sem mexer em nada
-    }
-
-    // 3. Se a linha for de cifras (não tem palavras longas), fazemos a troca
-    return linha.replace(regexAcordes, (match) => {
-      // Pequena trava extra: se a "nota" capturada for muito longa e tiver
-      // letras minúsculas estranhas, provavelmente não é um acorde.
-      if (match.length > 1 && /^[A-G][a-z]{2,}/.test(match)) {
-        return match;
+    const novasLinhas = linhas.map(linha => {
+      // 2. REGRA DE PROTEÇÃO:
+      // Se a linha contiver palavras com 3 ou mais letras minúsculas seguidas, 
+      // é quase certo que é uma linha de LETRA (ex: "está", "louvor", "amor").
+      // O acorde menor usa apenas um 'm' (ex: Am7), então ele passa no teste.
+      if (/[a-z]{3,}/.test(linha)) {
+        return linha; // Retorna a linha da letra sem mexer em nada
       }
 
-      // Se for acorde com barra (ex: C/E)
-      if (match.includes('/')) {
-        return match.split('/').map(p => transporAcorde(p.trim(), semitons)).join('/');
-      }
-      
-      return transporAcorde(match, semitons);
+      // 3. Se a linha for de cifras (não tem palavras longas), fazemos a troca
+      return linha.replace(regexAcordes, (match) => {
+        if (match.length > 1 && /^[A-G][a-z]{2,}/.test(match)) {
+          return match;
+        }
+        if (match.includes('/')) {
+          return match.split('/').map(p => transporAcorde(p.trim(), semitons)).join('/');
+        }
+
+        return transporAcorde(match, semitons);
+      });
     });
-  });
 
-  // 4. Junta as linhas de volta e atualiza o estado
-  setNovaCifra(novasLinhas.join('\n'));
-  
-  // Atualiza o Tom Principal do cabeçalho
-  setNovoTom((prev) => transporAcorde(prev, semitons));
-};
+    setNovaCifra(novasLinhas.join('\n'));
+
+    // Atualiza o Tom Principal do cabeçalho
+    setNovoTom((prev) => transporAcorde(prev, semitons));
+  };
 
   const salvarAlteracoes = async () => {
     try {
@@ -236,7 +231,6 @@ const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
               </h3>
 
               {editandoTudo ? (
-                /* Músicos também podem editar a letra abaixo da cifra se desejar */
                 <div className="flex flex-col gap-6">
                   <textarea
                     className="w-full bg-zinc-950 border border-blue-500/30 p-8 rounded-3xl font-mono text-xl leading-relaxed text-white-400 outline-none min-h-[400px] focus:ring-1 focus:ring-blue-500"
@@ -252,8 +246,25 @@ const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
                   />
                 </div>
               ) : (
-                <pre className="font-mono text-base md:text-lg leading-relaxed text-white-400 ... whitespace-pre overflow-x-auto scrollbar-hide">
-                  {novaCifra || "Nenhuma cifra disponível."}
+                <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
+                  {novaCifra ? (
+                    novaCifra.split('\n').map((linha, index) => {
+                      // Lógica: Se NÃO tem 3 letras minúsculas seguidas, é CIFRA (Laranja)
+                      // Se tem palavras, é LETRA (Branco)
+                      const ehLinhaDeCifra = !/[a-z]{3,}/.test(linha) && linha.trim().length > 0;
+
+                      return (
+                        <div
+                          key={index}
+                          className={`${ehLinhaDeCifra ? 'text-orange-400 font-bold' : 'text-white'}`}
+                        >
+                          {linha || ' '}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
+                  )}
                 </pre>
               )}
             </div>
