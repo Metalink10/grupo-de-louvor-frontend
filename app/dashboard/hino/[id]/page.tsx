@@ -245,44 +245,44 @@ export default function ExibirHino() {
                     onChange={(e) => setNovaLetra(e.target.value)}
                   />
                 </div>
+              ) : ) : (
+            <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
+              {novaCifra ? (
+                novaCifra.split('\n').map((linha, index) => {
+                  // 1. Dividimos a linha em partes mantendo os espaços
+                  const partes = linha.split(/(\s+)/);
+
+                  return (
+                    <div key={index} className="min-h-[1.5em]">
+                      {partes.map((parte, pIndex) => {
+                        const parteLimpa = parte.trim();
+                        
+                        // 2. Etiquetas que devem ficar brancas
+                        const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'ESTROFE'];
+                        const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
+
+                        // 3. Regra do Acorde (Regex atualizada para aceitar parênteses)
+                        const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|[0-9]|\(|\/|#|\+|\))*$/i;
+                        
+                        // 4. Decisão de cor
+                        const ehAcorde = !ehEtiqueta && parteLimpa.length > 0 && padraoAcorde.test(parteLimpa) && !/[a-z]{3,}/.test(parteLimpa);
+
+                        return (
+                          <span
+                            key={pIndex}
+                            className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
+                          >
+                            {parte}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  );
+                })
               ) : (
-                <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
-  {novaCifra ? (
-    novaCifra.split('\n').map((linha, index) => {
-      // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
-      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
-      // Código para preservar apenas as cifras na cor laranja
-     const partes = linha.split(/(\s+)/); 
-
-return (
-  <div key={index} className="min-h-[1.5em]">
-    {partes.map((parte, pIndex) => {
-      const parteLimpa = parte.trim();
-      
-      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'ESTROFE'];
-      const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
-      const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|[0-9]|\(|\/|#|\+)*$/i;
-      const ehAcorde = !ehEtiqueta && (padraoAcorde.test(parteLimpa) && !/[a-z]{3,}/.test(parteLimpa));
-
-      return (
-        <span
-          key={pIndex}
-          className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
-        >
-          {parte}
-        </span>
-      );
-    })}
-  </div>
-);
-      ));
-    })
-  ) : (
-    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
-  )}
-</pre>
+                <span className="text-zinc-500">Nenhuma cifra disponível.</span>
               )}
-            </div>
+            </pre>
           )}
         </div>
       </div>
