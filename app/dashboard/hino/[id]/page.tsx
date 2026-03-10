@@ -268,7 +268,7 @@ export default function ExibirHino() {
   const ehAcorde = padraoAcorde.test(parteLimpa);
 
   // 3. Se for uma palavra de letra (mesmo curta, mas que não encaixa no padrão de nota)
-  const ehPalavraDeLetra = !ehAcorde || /[a-z]{3,}/.test(parteLimpa);
+  const ehPalavraDeLetra = !ehAcorde || /[a-z]{2,}/.test(parteLimpa);
 
   return (
     <span
