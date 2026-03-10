@@ -245,7 +245,7 @@ export default function ExibirHino() {
                     onChange={(e) => setNovaLetra(e.target.value)}
                   />
                 </div>
-              ) : ) : (
+              ) : (
            <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
   {novaCifra ? (
     novaCifra.split('\n').map((linha, index) => {
