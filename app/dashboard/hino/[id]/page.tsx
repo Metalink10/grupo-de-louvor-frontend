@@ -251,35 +251,30 @@ export default function ExibirHino() {
     novaCifra.split('\n').map((linha, index) => {
       // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
       const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
+      // Código para preservar apenas as cifras na cor laranja
+     const partes = linha.split(/(\s+)/); 
 
-      // 2. Quebramos a linha preservando os espaços para não desalinhcar a cifra
-      // Usamos uma técnica de 'split' que mantém os espaços vazios
-      const partes = linha.split(/(\s+)/); 
+return (
+  <div key={index} className="min-h-[1.5em]">
+    {partes.map((parte, pIndex) => {
+      const parteLimpa = parte.trim();
+      
+      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'ESTROFE'];
+      const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
+      const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|[0-9]|\(|\/|#|\+)*$/i;
+      const ehAcorde = !ehEtiqueta && (padraoAcorde.test(parteLimpa) && !/[a-z]{3,}/.test(parteLimpa));
 
       return (
-        <div key={index} className="min-h-[1.2em]">
-          {partes.map((parte, pIndex) => {
-            const parteLimpa = parte.trim();
-  
-  // 1. Verificamos se é uma etiqueta (INTRO, etc)
-  const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE'];
-  const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
-  const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|7|9|11|13|M)*(\/[A-G][b#]?)?$/;
-  const ehAcorde = padraoAcorde.test(parteLimpa);
-
-  // 3. Se for uma palavra de letra (mesmo curta, mas que não encaixa no padrão de nota)
-  const ehPalavraDeLetra = !ehAcorde || /[a-z]{2,}/.test(parteLimpa);
-
-  return (
-    <span
-      key={pIndex}
-      className={ehAcorde && !ehEtiqueta ? 'text-orange-400 font-bold' : 'text-white'}
-    >
-      {parte}
-    </span>
-  );
-})}
-        </div>
+        <span
+          key={pIndex}
+          className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
+        >
+          {parte}
+        </span>
+      );
+    })}
+  </div>
+);
       );
     })
   ) : (
