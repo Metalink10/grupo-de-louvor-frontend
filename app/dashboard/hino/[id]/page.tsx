@@ -275,7 +275,7 @@ return (
     })}
   </div>
 );
-      );
+      ));
     })
   ) : (
     <span className="text-zinc-500">Nenhuma cifra disponível.</span>
