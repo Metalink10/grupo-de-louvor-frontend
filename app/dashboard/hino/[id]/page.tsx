@@ -259,26 +259,26 @@ export default function ExibirHino() {
       return (
         <div key={index} className="min-h-[1.2em]">
           {partes.map((parte, pIndex) => {
-            const parteLimpa = parte.trim().toUpperCase().replace(/[\[\]()]/g, '');
-            
-            // Lógica para decidir se a palavra é um ACORDE ou uma ETIQUETA/LETRA
-            // - Se estiver na lista de etiquetas: BRANCO
-            // - Se for uma letra de música (3+ minúsculas): BRANCO
-            // - Se for curto e parecer nota (A, B, C, G#, Dm7): LARANJA
-            
-            const ehEtiqueta = etiquetas.includes(parteLimpa);
-            const ehPalavraDeLetra = /[a-z]{3,}/.test(parte);
-            const ehAcorde = !ehEtiqueta && !ehPalavraDeLetra && /[A-G]/.test(parte);
+            const parteLimpa = parte.trim();
+  
+  // 1. Verificamos se é uma etiqueta (INTRO, etc)
+  const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE'];
+  const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
+  const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|7|9|11|13|M)*(\/[A-G][b#]?)?$/;
+  const ehAcorde = padraoAcorde.test(parteLimpa);
 
-            return (
-              <span
-                key={pIndex}
-                className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
-              >
-                {parte}
-              </span>
-            );
-          })}
+  // 3. Se for uma palavra de letra (mesmo curta, mas que não encaixa no padrão de nota)
+  const ehPalavraDeLetra = !ehAcorde || /[a-z]{3,}/.test(parteLimpa);
+
+  return (
+    <span
+      key={pIndex}
+      className={ehAcorde && !ehEtiqueta ? 'text-orange-400 font-bold' : 'text-white'}
+    >
+      {parte}
+    </span>
+  );
+})}
         </div>
       );
     })
