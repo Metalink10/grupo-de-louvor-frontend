@@ -246,43 +246,46 @@ export default function ExibirHino() {
                   />
                 </div>
               ) : ) : (
-            <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
-              {novaCifra ? (
-                novaCifra.split('\n').map((linha, index) => {
-                  // 1. Dividimos a linha em partes mantendo os espaços
-                  const partes = linha.split(/(\s+)/);
+           <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
+  {novaCifra ? (
+    novaCifra.split('\n').map((linha, index) => {
+      // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
+      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
 
-                  return (
-                    <div key={index} className="min-h-[1.5em]">
-                      {partes.map((parte, pIndex) => {
-                        const parteLimpa = parte.trim();
-                        
-                        // 2. Etiquetas que devem ficar brancas
-                        const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'ESTROFE'];
-                        const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
+      // 2. Quebramos a linha preservando os espaços para não desalinhcar a cifra
+      // Usamos uma técnica de 'split' que mantém os espaços vazios
+      const partes = linha.split(/(\s+)/); 
 
-                        // 3. Regra do Acorde (Regex atualizada para aceitar parênteses)
-                        const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|[0-9]|\(|\/|#|\+|\))*$/i;
-                        
-                        // 4. Decisão de cor
-                        const ehAcorde = !ehEtiqueta && parteLimpa.length > 0 && padraoAcorde.test(parteLimpa) && !/[a-z]{3,}/.test(parteLimpa);
+      return (
+        <div key={index} className="min-h-[1.2em]">
+          {partes.map((parte, pIndex) => {
+            const parteLimpa = parte.trim().toUpperCase().replace(/[\[\]()]/g, '');
+            
+            // Lógica para decidir se a palavra é um ACORDE ou uma ETIQUETA/LETRA
+            // - Se estiver na lista de etiquetas: BRANCO
+            // - Se for uma letra de música (3+ minúsculas): BRANCO
+            // - Se for curto e parecer nota (A, B, C, G#, Dm7): LARANJA
+            
+            const ehEtiqueta = etiquetas.includes(parteLimpa);
+            const ehPalavraDeLetra = /[a-z]{3,}/.test(parte);
+            const ehAcorde = !ehEtiqueta && !ehPalavraDeLetra && /[A-G]/.test(parte);
 
-                        return (
-                          <span
-                            key={pIndex}
-                            className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
-                          >
-                            {parte}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  );
-                })
-              ) : (
-                <span className="text-zinc-500">Nenhuma cifra disponível.</span>
-              )}
-            </pre>
+            return (
+              <span
+                key={pIndex}
+                className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
+              >
+                {parte}
+              </span>
+            );
+          })}
+        </div>
+      );
+    })
+  ) : (
+    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
+  )}
+</pre>
           )}
         </div>
       </div>
