@@ -245,49 +245,46 @@ export default function ExibirHino() {
                     onChange={(e) => setNovaLetra(e.target.value)}
                   />
                 </div>
-              ) : (
-                <pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
-                  {novaCifra ? (
-                    novaCifra.split('\n').map((linha, index) => {
-                      // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
-                      const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
+              ) : (<pre className="font-mono text-base md:text-lg leading-relaxed whitespace-pre overflow-x-auto scrollbar-hide">
+                {novaCifra ? (
+                  novaCifra.split('\n').map((linha, index) => {
+                    // 1. Lista de palavras que DEVEM ficar brancas (etiquetas)
+                    const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'PONTE'];
 
-                      // 2. Quebramos a linha preservando os espaços para não desalinhcar a cifra
-                      // Usamos uma técnica de 'split' que mantém os espaços vazios
-                      const partes = linha.split(/(\s+)/);
+                    // 2. Quebramos a linha preservando os espaços para não desalinhcar a cifra
+                    // Usamos uma técnica de 'split' que mantém os espaços vazios
+                    const partes = linha.split(/(\s+)/);
 
-                      return (
-                        <div key={index} className="min-h-[1.5em]">
-                          {partes.map((parte, pIndex) => {
-                            const parteLimpa = parte.trim();
+                    return (
+                      <div key={index} className="min-h-[1.2em]">
+                        {partes.map((parte, pIndex) => {
+                          const parteLimpa = parte.trim().toUpperCase().replace(/[\[\]()]/g, '');
 
-                            const etiquetas = ['INTRO', 'REFRÃO', 'PONTE', 'SOLO', 'CORO', 'FINAL', 'FRASE', 'ESTROFE'];
-                            const ehEtiqueta = etiquetas.includes(parteLimpa.toUpperCase().replace(/[\[\]()]/g, ''));
+                          // Lógica para decidir se a palavra é um ACORDE ou uma ETIQUETA/LETRA
+                          // - Se estiver na lista de etiquetas: BRANCO
+                          // - Se for uma letra de música (3+ minúsculas): BRANCO
+                          // - Se for curto e parecer nota (A, B, C, G#, Dm7): LARANJA
 
-                            // NOVA REGEX: Aceita letras A-G, #, b, números, m, e agora PARÊNTESES (11), (9), etc.
-                            const padraoAcorde = /^[A-G][b#]?(m|maj|min|aug|dim|sus|add|[0-9]|\(|\/|#|\+)*$/i;
+                          const ehEtiqueta = etiquetas.includes(parteLimpa);
+                          const ehPalavraDeLetra = /[a-z]{3,}/.test(parte);
+                          const ehAcorde = !ehEtiqueta && !ehPalavraDeLetra && /[A-G]/.test(parte);
 
-                            // Ajustamos a regra: 
-                            // 1. Deve passar na Regex de acorde OU ter menos de 3 letras minúsculas (se for curto e tiver nota)
-                            // 2. Não pode ser etiqueta
-                            const ehAcorde = !ehEtiqueta && (padraoAcorde.test(parteLimpa) && !/[a-z]{3,}/.test(parteLimpa));
-
-                            return (
-                              <span
-                                key={pIndex}
-                                className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
-                              >
-                                {parte}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <span className="text-zinc-500">Nenhuma cifra disponível.</span>
-                  )}
-                </pre>
+                          return (
+                            <span
+                              key={pIndex}
+                              className={ehAcorde ? 'text-orange-400 font-bold' : 'text-white'}
+                            >
+                              {parte}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <span className="text-zinc-500">Nenhuma cifra disponível.</span>
+                )}
+              </pre>
               )}
             </div>
           )}
