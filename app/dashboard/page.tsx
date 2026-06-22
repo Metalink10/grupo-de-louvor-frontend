@@ -22,7 +22,7 @@ export default function Dashboard() {
         const role = localStorage.getItem('userRole');
         const name = localStorage.getItem('userName');
 
-        if (!token) { window.location.href = '/'; return; }
+        if (!token) { router.push('/'); return; }
 
         setUserRole(role || 'USER');
         setUserName(name || 'Usuário');
@@ -53,11 +53,11 @@ export default function Dashboard() {
             setHinosFiltrados(response.data);
         } catch (err: any) {
             console.error("Erro no Dashboard:", err);
-            if (err.response?.status === 401) window.location.href = '/';
+            if (err.response?.status === 401) router.push('/');
         } finally { setLoading(false); }
     }
 
-    const logout = () => { localStorage.clear(); window.location.href = '/'; };
+    const logout = () => { localStorage.clear(); router.push('/'); };
 
     const formatarCargo = (cargo: string) => {
         if (cargo === 'ADMIN') return 'Administrador';

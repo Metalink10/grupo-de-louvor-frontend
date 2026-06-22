@@ -22,14 +22,15 @@ export default function GestaoMembros() {
     async function carregarMembros() {
         try {
             const token = localStorage.getItem('userToken'); // Busca o token salvo no login
+            console.log(token)
 
             if (!token) {
-                window.location.href = '/';
+                router.push('/')
                 return;
             }
 
             // Faz a chamada com o prefixo correto (/api/auth) e envia o Token
-            const res = await api.get('/auth/usuarios', {
+            const res = await api.get('/api/auth/usuarios', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -40,7 +41,7 @@ export default function GestaoMembros() {
             console.error("Erro ao carregar membros:", err);
             if (err.response?.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
-                window.location.href = '/';
+                router.push('/');
             }
         } finally {
             setLoading(false);
@@ -56,14 +57,14 @@ export default function GestaoMembros() {
 
             if (confirmacao.tipo === 'DELETAR') {
                 // No DELETE, o corpo (data) vai dentro do config
-                await api.delete(`/auth/usuarios/deletar/${confirmacao.id}`, {
+                await api.delete(`/api/auth/usuarios/deletar/${confirmacao.id}`, {
                     ...config,
                     data: { senhaAdmin }
                 });
                 alert("Membro removido.");
             } else {
                 // No PUT, o config é o terceiro parâmetro
-                await api.put(`/auth/usuarios/alterar-cargo/${confirmacao.id}`, {
+                await api.put(`/api/auth/usuarios/alterar-cargo/${confirmacao.id}`, {
                     novoCargo: confirmacao.novoCargo,
                     senhaAdmin
                 }, config);
