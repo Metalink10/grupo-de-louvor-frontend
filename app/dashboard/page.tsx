@@ -90,7 +90,6 @@ export default function Dashboard() {
                         
                         <div className=' flex items-center gap-4'>
                             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Repertório Total</p>
-                            {/* O segredo está aqui: hinos.length */}
                             <h2 className="text-1xl font-black text-white">
                                 {hinos.length > 0 ? hinos.length : "0"}
                             </h2>
@@ -129,8 +128,8 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {hinosFiltrados.map((hino: any) => {
-                            const numeroReal = hinos.findIndex(h => h.id === hino.id) + 1;
+                        {hinosFiltrados.toReversed().map((hino: any) => {
+                            const numeroReal = hinos.findLastIndex(h => h.id === hino.id) + 1;
 
                             return (
                                 <div
